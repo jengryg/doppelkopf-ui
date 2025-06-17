@@ -1,0 +1,16 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row">
+      <form method="post">
+        <div class="input-group" ngbTooltip="Make a bid for your hand. Only possible if you declared a reservation before.">
+          <select class="form-select" id="declareSelect" aria-label="Select the declaration for your hand" required>
+            <option selected disabled>Select Bid</option>
+            <option value="MARRIAGE" [disabled]="true">Marriage</option>
+            <option value="SOLO_DIAMONDS" [disabled]="true">Solo Diamonds</option>
+          </select>
+          <button class="btn btn-outline-secondary" type="submit">Make Bid</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

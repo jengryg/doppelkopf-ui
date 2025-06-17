@@ -1,1 +1,75 @@
-<p>game works!</p>
+<div class="container">
+  <header>
+    <div class="d-flex flex-row mt-2">
+      <div class="text-center flex-fill">
+        <h3>Table [table name] - Players [current]/[max]</h3>
+      </div>
+    </div>
+    <div class="d-flex flex-row mb-4">
+      <div class="text-center flex-fill">
+        <h3>Round [number] - [deck mode]</h3>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="d-flex align-items-stretch mb-2">
+      <div class="me-2">
+        <app-seat></app-seat>
+      </div>
+      <div class="">
+        <app-seat></app-seat>
+      </div>
+      <div class="ms-2">
+        <app-seat></app-seat>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-stretch mb-2">
+      <div class="me-2">
+        <app-seat></app-seat>
+      </div>
+      <div class="">
+        <app-trick></app-trick>
+      </div>
+      <div class="ms-2">
+        <app-seat></app-seat>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-stretch mb-4">
+      <div class="me-2">
+        <app-seat></app-seat>
+      </div>
+      <div class="">
+        <app-seat></app-seat>
+      </div>
+      <div class="ms-2">
+        <app-seat></app-seat>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-stretch mb-4">
+      <div class="w-100">
+        <app-state></app-state>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-stretch mb-4">
+      <div class="w-100">
+        <app-action></app-action>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-stretch mb-4">
+      <div class="w-100">
+        <app-hand></app-hand>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-stretch mb-2">
+      <div class="w-100">
+        <app-results></app-results>
+      </div>
+    </div>
+  </main>
+</div>
