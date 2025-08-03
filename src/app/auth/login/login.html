@@ -1,0 +1,26 @@
+<div class="card">
+    <div class="card-header">
+        Login if you already have an account
+    </div>
+    <div class="card-body">
+        <form method="post" id="loginForm" (ngSubmit)="onLoginSubmit($event)">
+            <div class="row mb-3">
+                <label for="loginUsername" class="col-sm-3 col-form-label fs-4 p">Username</label>
+                <div class="col-sm-9">
+                    <input type="text" name="loginUsername" id="loginUsername" class="form-control" required
+                           [(ngModel)]="username">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="loginPassword" class="col-sm-3 col-form-label fs-4 p">Password</label>
+                <div class="col-sm-9">
+                    <input type="password" name="loginPassword" id="loginPassword" class="form-control" required
+                           [(ngModel)]="password">
+                </div>
+            </div>
+            <div class="col-sm-9 offset-sm-3 d-grid">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </form>
+    </div>
+</div>

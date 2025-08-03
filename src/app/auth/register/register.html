@@ -1,0 +1,33 @@
+<div class="card">
+  <div class="card-header">
+    Register a new account
+  </div>
+  <div class="card-body">
+    <form method="post" id="registerForm" (ngSubmit)="onRegisterSubmit($event)">
+      <div class="row mb-3">
+        <label for="registerUsername" class="col-sm-3 col-form-label fs-4 p">Username</label>
+        <div class="col-sm-9">
+          <input type="text" name="registerUsername" id="registerUsername" class="form-control" required
+                 [(ngModel)]="username">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="registerPassword" class="col-sm-3 col-form-label fs-4 p">Password</label>
+        <div class="col-sm-9">
+          <input type="password" name="registerPassword" id="registerPassword" class="form-control" required
+                 [(ngModel)]="password">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="registerPasswordConfirm" class="col-sm-3 col-form-label fs-4 p">Password</label>
+        <div class="col-sm-9">
+          <input type="password" name="registerPasswordConfirm" id="registerPasswordConfirm" class="form-control" required
+                 [(ngModel)]="passwordConfirm">
+        </div>
+      </div>
+      <div class="col-sm-9 offset-sm-3 d-grid">
+        <button type="submit" class="btn btn-primary">Register</button>
+      </div>
+    </form>
+  </div>
+</div>
