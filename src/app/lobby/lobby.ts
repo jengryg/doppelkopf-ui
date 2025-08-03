@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {Tables} from './tables/tables';
 import {NewTable} from './new-table/new-table';
 

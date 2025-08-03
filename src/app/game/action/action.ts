@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {Bid} from './bid/bid';
 import {Declare} from './declare/declare';
 import {Call} from './call/call';

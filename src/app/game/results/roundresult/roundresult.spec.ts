@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { Roundresult } from './roundresult';
+import {Roundresult} from './roundresult';
 
 describe('Roundresult', () => {
   let component: Roundresult;
@@ -10,7 +10,7 @@ describe('Roundresult', () => {
     await TestBed.configureTestingModule({
       imports: [Roundresult]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(Roundresult);
     component = fixture.componentInstance;

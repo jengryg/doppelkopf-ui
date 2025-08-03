@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {Seat} from './seat/seat';
 import {Trick} from './trick/trick';
 import {State} from './state/state';

@@ -1,11 +1,8 @@
-import { Component } from '@angular/core';
-import {Card} from "../../card/card";
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-roundresult',
-    imports: [
-        Card
-    ],
+  imports: [],
   templateUrl: './roundresult.html',
   styleUrl: './roundresult.scss'
 })
