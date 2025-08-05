@@ -31,7 +31,7 @@ export class AuthService {
     }
 
     register(username: string, password: string, passwordConfirm: string) {
-        return this.http.post<User>(`${uri}v1/auth/register`, {
+        return this.http.post<User>(`${uri}v1/users`, {
             username, password, passwordConfirm
         });
     }
