@@ -1,0 +1,909 @@
+"""
+A moment in time that is uniquely identified using the ISO-8601 instant format.
+Example: 2011-12-03T10:15:30Z
+"""
+scalar Instant
+
+"""
+An array of bytes, encoded as url-safe Base64 with mandatory padding.
+"""
+scalar ByteArray
+
+"""
+All queries this graphQL API supports.
+"""
+type Query {
+    """
+    Gets detailed information about the current user.
+    """
+    privateUser: PrivateUser!
+
+    """
+    Gets the public information about the user with the specified id.
+    """
+    publicUser(id: ID!): PublicUser!
+
+    """
+    Get all games currently available.
+    """
+    games: [Game!]!
+
+    """
+    Get information about the game with the specified id.
+    """
+    game(id: ID!) : Game!
+
+    """
+    Get information about the player with the specified id.
+    """
+    player(id: ID!): Player!
+
+    """
+    Get information about the round with the specified id.
+    """
+    round(id: ID!): Round!
+
+    """
+    Get the public information about the hand with the specified id.
+    """
+    publicHand(id: ID!): PublicHand!
+
+    """
+    Get the private information about the hand with the specified id.
+    This can only be used by the owner of the hand.
+    """
+    privateHand(id: ID!): PrivateHand!
+
+    """
+    Get information about the trick with the specified id.
+    """
+    trick(id: ID!): Trick!
+
+    """
+    Get information about the turn with the specified id.
+    """
+    turn(id: ID!): Turn!
+
+    """
+    Get information about the call with the specified id.
+    """
+    call(id: ID!): Call!
+}
+
+"""
+All mutations this graphQL API supports.
+"""
+type Mutation {
+    """
+    Create a new game based on the provided data.
+    """
+    createGame(createGameInput: CreateGameInput!): Game!
+
+    """
+    Start the game with the specified id.
+    """
+    startGame(gameId: ID!): Game!
+
+    """
+    Join a game as user to create a new player.
+    """
+    joinGame(joinGameInput: JoinGameInput!): Player!
+
+    """
+    Deal cards in the specified game to create a new round.
+    """
+    createRound(gameId: ID!): Round!
+
+    """
+    Make a declare for the hand based on the provided data.
+    """
+    declare(declareInput: DeclareInput): PrivateHand!
+
+    """
+    Make a bid for the hand based on the provided data.
+    """
+    bid(bidInput: BidInput): PrivateHand!
+
+    """
+    Play a card in the round based on the provided data.
+    """
+    playCard(playCardInput: PlayCardInput): Turn!
+
+    """
+    Make a call in the round based on the provided data.
+    """
+    makeCall(makeCallInput: MakeCallInput): Call!
+}
+
+"""
+Object metadata that tracks when an object was created and updated.
+"""
+type CreatedUpdated {
+    """
+    The object was created at this moment.
+    """
+    created: Instant!
+
+    """
+    The object was updated the last time at this moment.
+    """
+    updated: Instant!
+}
+
+"""
+Common interface for all types that provide CreatedUpdated time instant information.
+"""
+interface HasCreatedUpdated {
+    cu: CreatedUpdated
+}
+
+"""
+Object metadata that tracks when an object was started and ended.
+"""
+type StartedEnded {
+    """
+    The parent object was started at this moment. If this is null, the parent object was not started yet.
+    """
+    started: Instant
+
+    """
+    The parent object was ended at this moment. If this is null, the parent object was not ended yet.
+    """
+    ended: Instant
+}
+
+"""
+Common interface for all types that provide StartedEnded time instant information.
+"""
+interface HasStartedEnded {
+    se: StartedEnded
+}
+
+"""
+Information about a user that is only available to that user themselves.
+"""
+type PrivateUser implements HasCreatedUpdated {
+    id: ID!
+    name: String!
+    cu: CreatedUpdated!
+}
+
+"""
+Information about a user that is available to all other users.
+"""
+type PublicUser {
+    id: ID!
+    name: String!
+}
+
+"""
+Information about a game of Doppelkopf.
+"""
+type Game implements HasCreatedUpdated & HasStartedEnded {
+    """
+    "The UUID of this game."
+    """
+    id: ID!
+
+    """
+    The created and updated meta data of this game.
+    """
+    cu: CreatedUpdated!
+
+    """
+    The started and ended moments of this game.
+    """
+    se: StartedEnded!
+
+    """
+    How many players are at most allowed to join this game.
+    """
+    playerLimit: Int!
+
+    """
+    The current state of this game.
+    """
+    state: GameState!
+
+    """
+    The players of this game.
+    """
+    players: [Player!]!
+
+    """
+    The player of the current user if they are playing in this game, otherwise null.
+    """
+    player: Player
+
+    """
+    The rounds of this game.
+    """
+    rounds: [Round!]!
+
+    """
+    The current active round of this game if there is one, otherwise null.
+    """
+    currentRound: Round
+}
+
+"""
+Indicates the current phase the game is in.
+"""
+enum GameState {
+    INITIALIZED
+    WAITING_FOR_DEAL
+    PLAYING_ROUND
+}
+
+"""
+Send this to create a new game.
+"""
+input CreateGameInput {
+    """
+    How many players are at most allowed to join the game.
+    """
+    playerLimit: Int!
+
+    """
+    The seed to use for the game encoded as Base64. If null, a random seed is generated
+    """
+    seed: ByteArray
+}
+
+"""
+Information about the player, that is a user in a game.
+"""
+type Player implements HasCreatedUpdated {
+    """
+    The UUID of this player.
+    """
+    id: ID!
+
+    """
+    The created and updated meta data of this game.
+    """
+    cu: CreatedUpdated!
+
+    """
+    The game this player is playing in.
+    """
+    game: Game!
+
+    """
+    The number of the seat this player is sitting on in the game.
+    """
+    seat: Int!
+
+    """
+    The user that is playing in the game as this player.
+    """
+    user: PublicUser!
+
+    """
+    Is this player is the current dealer in the game.
+    """
+    dealer: Boolean!
+}
+
+"""
+Join a game at the specified seat as player.
+"""
+input JoinGameInput {
+    """
+    The UUID of the game to join.
+    """
+    gameId: ID!
+
+    """
+    The seat position to take.
+    """
+    seat: Int!
+}
+
+"""
+Information about a round in a game of Doppelkopf.
+"""
+type Round implements HasCreatedUpdated & HasStartedEnded {
+    """
+    The UUID of this round.
+    """
+    id: ID!
+
+    """
+    The created and updated meta data of this game.
+    """
+    cu: CreatedUpdated!
+
+    """
+    The started and ended moments of this game.
+    """
+    se: StartedEnded!
+
+    """
+    The game this round is played in.
+    """
+    game: Game!
+
+    """
+    The player that dealt this round.
+    """
+    dealer: Player!
+
+    """
+    The number of this round, incrementally starting at 1.
+    """
+    number: Int!
+
+    """
+    The current state of the round.
+    """
+    state: RoundState!
+
+    """
+    The public contract information of the round.
+    """
+    contract: RoundContractPublic!
+
+    """
+    The result of this round if available, otherwise null.
+    """
+    result: TeamedResult
+
+    """
+    The public information about the hands of the players.
+    """
+    hands: [PublicHand!]
+
+    """
+    The private information about the hand.
+    This shows the hand of the player, if the authenticated user has a hand in this round. Otherwise null.
+    """
+    hand: PrivateHand
+
+    """
+    The tricks of this round.
+    """
+    tricks: [Trick!]!
+
+    """
+    The current active trick of this round if there is one, otherwise null.
+    """
+    currentTrick: Trick
+
+    """
+    The calls made in this round.
+    """
+    calls: [Call!]!
+
+    """
+    The turns made in this round.
+    """
+    turns: [Turn!]!
+}
+
+"""
+Public information about a hand.
+"""
+type PublicHand implements HasCreatedUpdated {
+    """
+    The UUID of this hand.
+    """
+    id: ID!
+
+    """
+    The created and updated meta data of this game.
+    """
+    cu: CreatedUpdated!
+
+    """
+    The player this hand is played by.
+    """
+    player: Player!
+
+    """
+    The round this hand is played in.
+    """
+    round: Round!
+
+    """
+    The declaration of this hand if it was already made.
+    """
+    declared: DeclarationPublic!
+
+    """
+    The bid of this hand if it was already made.
+    """
+    bid: BiddingPublic!
+
+    """
+    The team this hands plays on, from the viewpoint of other players in the game.
+    """
+    team: Team!
+
+    """
+    The calls made by this hand.
+    """
+    calls: [Call!]!
+}
+
+"""
+Private information about a hand.
+This is only available to the owner of the hand.
+"""
+type PrivateHand {
+    """
+    The UUID of this hand.
+    """
+    id: ID!
+
+    """
+    The public information about this hand.
+    """
+    public: PublicHand!
+
+    """
+    The team this hands plays on, from the viewpoint of the player of this hand.
+    """
+    team: Team!
+
+    """
+    The cards that were already played by this hand.
+    """
+    cardsPlayed: [String!]!
+
+    """
+    The cards that this hand has still to play.
+    """
+    cardsRemaining: [String!]!
+}
+
+"""
+The public bids that are derived from the bids the players can make for their hands.
+This enum is used for the communication out of the system.
+"""
+enum BiddingPublic {
+    NOTHING
+
+    MARRIAGE
+
+    SOLO_DIAMONDS
+    SOLO_HEARTS
+    SOLO_SPADES
+    SOLO_CLUBS
+
+    SOLO_QUEENS
+    SOLO_JACKS
+
+    SOLO_FREE
+}
+
+"""
+The bids the player can make for their hands.
+This enum is used for the communication into the system. It prevents the usage of NOTHING.
+"""
+enum BiddingOption {
+    MARRIAGE
+
+    SOLO_DIAMONDS
+    SOLO_HEARTS
+    SOLO_SPADES
+    SOLO_CLUBS
+
+    SOLO_QUEENS
+    SOLO_JACKS
+
+    SOLO_FREE
+}
+
+"""
+The public declarations that are derived from the declarations the players can make for their hands.
+This enum hides the SILENT_MARRIAGE option from the public.
+"""
+enum DeclarationPublic {
+    NOTHING
+    HEALTHY
+    RESERVATION
+}
+
+"""
+The declaration options the player can make on their hands.
+This enum is used for the communication into the system. It prevents the usage of NOTHING and offers the SILENT_MARRIAGE
+option that is hidden to the outside in DeclarationPublic.
+"""
+enum DeclarationOption {
+    HEALTHY
+    SILENT_MARRIAGE
+    RESERVATION
+
+}
+
+"""
+Send this to make the declaration on the hand given by the specified id.
+Only possible if the specified hand belongs to the user.
+"""
+input DeclareInput {
+    handId: ID!
+    declaration: DeclarationOption!
+}
+
+"""
+Send this to make the bid on the hand given by the specified id.
+Only possible if the specified hand belongs to the user.
+"""
+input BidInput {
+    handId: ID!
+    bid: BiddingOption!
+}
+
+"""
+Indicates the current phase the round is in.
+"""
+enum RoundState {
+    WAITING_FOR_DECLARATIONS
+    WAITING_FOR_BIDS
+    PLAYING_TRICKS
+    EVALUATED
+}
+
+"""
+Indicates the specific variant of the round that is played based on the game rules.
+This enum hides the SILENT_MARRIAGE option from the public.
+"""
+enum RoundContractPublic {
+    UNDECIDED
+    NORMAL
+    MARRIAGE_UNRESOLVED
+    MARRIAGE_RESOLVED
+    MARRIAGE_SOLO
+    SOLO
+}
+
+"""
+Results tagged with the corresponding team.
+"""
+type TeamedResult {
+    """
+    Result of the re team.
+    """
+    re: RoundResult!
+
+    """
+    Result of the ko team.
+    """
+    ko: RoundResult!
+}
+
+"""
+The Doppelkopf game has two teams playing against each other, RE and KO.
+This enum allows for the NA option if the team is not yet known.
+"""
+enum Team {
+    NA
+    RE
+    KO
+}
+
+"""
+The Doppelkopf game has two teams playing against each other, RE and KO.
+This enum only allows these two options to reflect objects that can only have a definite Team assigned.
+"""
+enum DefiniteTeam {
+    RE
+    KO
+}
+
+"""
+Information about a result of a round in a game of Doppelkopf.
+"""
+type RoundResult implements HasCreatedUpdated {
+    """
+    The UUID of this result.
+    """
+    id: ID!
+
+    """
+    The created and updated meta data of this game.
+    """
+    cu: CreatedUpdated!
+
+    """
+    The round this result is from.
+    """
+    round: Round!
+
+    """
+    The team this result is for.
+    """
+    team: DefiniteTeam!
+
+    """
+    The number of tricks this team obtained.
+    """
+
+    trickCount: Int!
+    """
+    The total score this team obtained.
+    """
+
+    scoreObtained: Int!
+
+    """
+    The target score this team must obtain.
+    """
+    scoreTarget: Int!
+
+    """
+    The points awarded to this team.
+    """
+    points: PointsResult!
+}
+
+"""
+The points divided in multiple categories.
+"""
+type PointsResult {
+    winning: Int!
+    teamCalls: PointsResultTeamCalls!
+    underCalls: PointsResultUnderCalls!
+    lostScore: ScoreQuadruple!
+    special: PointsResultSpecial!
+}
+
+"""
+There are multiple aspects of Doppelkopf using the 4 levels (90, 60, 30, 0), e.g. calls, score level.
+This type allows us to have a simple representation of these aspects.
+"""
+type ScoreQuadruple {
+    p90: Int!
+    p60: Int!
+    p30: Int!
+    p00: Int!
+}
+
+"""
+These special points can only be obtained when the round is played according to the NORMAL or MARRIAGE contract.
+"""
+type PointsResultSpecial {
+    """
+    If KO wins against RE, they get an extra point.
+    """
+    opposition: Int!
+
+    """
+    Each trick that has 40 or more score, give the team that scored this trick 1 extra point.
+    """
+    doppelkopf: Int!
+
+    """
+    If the last trick is won with Jack of Clubs (charly), the team scoring this trick gets 1 extra point.
+    """
+    charly: Int!
+}
+
+"""
+The points for the under calls of each team.
+"""
+type PointsResultUnderCalls {
+    """
+    The winner gets 1 point for each under call made by RE team.
+    """
+    re: ScoreQuadruple!
+
+    """
+    The winner gets 1 point for each under call made by KO team.
+    """
+    ko: ScoreQuadruple!
+}
+
+"""
+The points for the team calls of each teams.
+"""
+type PointsResultTeamCalls {
+    """
+    The winner gets 2 points if RE made their team call.
+    """
+    re: Int!
+
+    """
+    The winner gets 2 points if KO made their team call.
+    """
+    ko: Int!
+}
+
+"""
+Information about a Trick in a round of Doppelkopf.
+"""
+type Trick implements HasCreatedUpdated & HasStartedEnded {
+    """
+    The UUID of this trick.
+    """
+    id: ID!
+
+    """
+    The created and updated meta data of this game.
+    """
+    cu: CreatedUpdated!
+
+    """
+    The started and ended moments of this game.
+    """
+    se: StartedEnded!
+
+    """
+    The round this trick is played in.
+    """
+    round: Round!
+
+    """
+    The cards that this trick currently contains in order.
+    """
+    cards: [String!]!
+
+    """
+    The number of this trick with respect to the round.
+    """
+    number: Int!
+
+    """
+    The current state of this trick.
+    """
+    state: TrickState!
+
+    """
+    The demand of this trick.
+    """
+    demand: CardDemand!
+
+    """
+    The index of the hand that played the first card of this hand.
+    """
+    openIndex: Int!
+
+    """
+    The index of the currently leading card of this trick with respect to the cards list.
+    """
+    leadingCardIndex: Int!
+
+    """
+    The winner of this trick if known, otherwise null.
+    """
+    winner: PublicHand
+
+    """
+    The current score of this trick.
+    """
+    score: Int!
+}
+
+"""
+Indicates the current phase the trick is in.
+"""
+enum TrickState {
+    FIRST_CARD_PLAYED
+    SECOND_CARD_PLAYED
+    THIRD_CARD_PLAYED
+    FOURTH_CARD_PLAYED
+}
+
+"""
+The first card of each trick defined the [CardDemand] that MUST be satisfied by a hand, if it can.
+"""
+enum CardDemand {
+    COLORED
+    DIAMOND
+    HEARTS
+    SPADES
+    CLUBS
+}
+
+"""
+Information about a turn in a round and trick of Doppelkopf.
+"""
+type Turn implements HasCreatedUpdated {
+    """
+    The UUID of this turn.
+    """
+    id: ID!
+
+    """
+    The created and updated meta data of this game.
+    """
+    cu: CreatedUpdated!
+
+    """
+    The round this turn is made in.
+    """
+    round: Round!
+
+    """
+    The the hand this turn is made by.
+    """
+    hand: PublicHand!
+
+    """
+    The trick this turn is made in.
+    """
+    trick: Trick!
+
+    """
+    The number of this turn, incrementally starting at 1.
+    """
+    number: Int!
+
+    """
+    The card played in this turn.
+    """
+    card: String!
+}
+
+"""
+Send this to play the card in the round with the specified id.
+"""
+input PlayCardInput {
+    """
+    The UUID of the round to play the card in.
+    """
+    roundId: ID!
+
+    """
+    The card you want to play.
+    Must be one of the remaining cards on your hand.
+    """
+    card: String!
+}
+
+type Call implements HasCreatedUpdated {
+    """
+    The UUID of this call.
+    """
+    id: ID!
+
+    """
+    The created and updated meta data of this game.
+    """
+    cu: CreatedUpdated!
+
+    """
+    The hand this call was made by.
+    """
+    hand: PublicHand!
+
+    """
+    The round this call was made in.
+    """
+    round: Round!
+
+    """
+    The type of this call.
+    """
+    callType: CallType!
+
+    """
+    The description of this call.
+    """
+    description: String!
+
+    """
+    The number of cards tha hand had already played when this call was made.
+    """
+    cardsPlayedBefore: Int!
+}
+
+"""
+The different types of calls that can be made.
+"""
+enum CallType {
+    UNDER_120
+    UNDER_90
+    UNDER_60
+    UNDER_30
+    NO_TRICKS
+}
+
+"""
+Send this to make a call for the hand specified by id.
+"""
+input MakeCallInput {
+    handId: ID!
+    callType: CallType!
+}

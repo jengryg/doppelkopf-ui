@@ -1,0 +1,10 @@
+mutation createGame($playerLimit: Int!, $seed: ByteArray) {
+    createGame(
+        createGameInput: {
+            playerLimit: $playerLimit,
+            seed: $seed,
+        }
+    ) {
+        ...gameProperties
+    }
+}
